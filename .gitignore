@@ -4,6 +4,7 @@
 *.rej
 *.sw[a-p]
 
+.tox/
 
 *LOCAL*
 *REMOTE*
