@@ -49,11 +49,51 @@ class BaseJobTests(unittest.TestCase):
 
 
 
-    def test_OK_calls_check_self_and_returns_if_true(self,):
+    def test_OK_calls_check_self_and_returns_if_false(self,):
+        with unittest.mock.patch.object(self.j,'check_self',return_value = False) as ok:
+            rv = self.j.Ok()
+
+        ok.assert_called_once_with()
+        self.assertEqual(rv,False)
+
+    def test_OK_calls_check_self_and_calls_ok_on_deps_if_true(self,):
+        class Nowtjob(Job):
+            def __init__(self, ok):
+                self._ok = ok
+
+            def Ok(self):
+                return self._ok
+
+        for i in range(10):
+            self.j.add_dependency(Nowtjob(True))
+
         with unittest.mock.patch.object(self.j,'check_self',return_value = True) as ok:
             rv = self.j.Ok()
 
         ok.assert_called_once_with()
         self.assertEqual(rv,True)
 
+    def test_OK_calls_check_self_and_calls_ok_on_deps_if_true_It_only_take_one_dep_to_fail_Ok(self,):
+        class Nowtjob(Job):
+            def __init__(self, ok):
+                self._ok = ok
 
+            def Ok(self):
+                return self._ok
+
+        for i in range(10):
+            self.j.add_dependency(Nowtjob(i == 9))
+
+        with unittest.mock.patch.object(self.j,'check_self',return_value = True) as ok:
+            rv = self.j.Ok()
+
+        ok.assert_called_once_with()
+        self.assertEqual(rv,False)
+
+
+    def test_a_new_job_has_an_empty_deps_list(self,):
+        self.assertEqual(len(self.j.dependencies),0)
+
+    def test_add_depency_adds_it_argument_to_depencies(self,):
+        self.j.add_dependency(unittest.mock.sentinel.NEW_DEP)
+        self.assertIn( unittest.mock.sentinel.NEW_DEP, self.j.dependencies,)

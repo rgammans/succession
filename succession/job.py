@@ -5,8 +5,15 @@ async def nothing_to_do():
 
 
 class Job:
+    def __init__(self,):
+        self.dependencies = []
+
+    def add_dependency(self, newdep):
+        self.dependencies.append(newdep)
+
     def Ok(self):
-        pass
+        return ( self.check_self() and
+                all( d.Ok() for d in self.dependencies ))
 
     def Run(self,):
         """Return completion promise for upto date ness of this job"""
