@@ -1,0 +1,12 @@
+*~
+*.pyc
+*.orig
+*.rej
+*.sw[a-p]
+
+
+*LOCAL*
+*REMOTE*
+*BACKUP*
+*BASE*
+
