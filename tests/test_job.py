@@ -11,6 +11,13 @@ coroutine = type(foo)
 try: foo.send(None)
 except: pass
 
+class MockJob(Job):
+    def __init__(self, ok):
+        self._ok = ok
+
+    def Ok(self):
+        return self._ok
+
 
 class BaseJobTests(unittest.TestCase):
     def setUp(self,):
@@ -57,15 +64,8 @@ class BaseJobTests(unittest.TestCase):
         self.assertEqual(rv,False)
 
     def test_OK_calls_check_self_and_calls_ok_on_deps_if_true(self,):
-        class Nowtjob(Job):
-            def __init__(self, ok):
-                self._ok = ok
-
-            def Ok(self):
-                return self._ok
-
         for i in range(10):
-            self.j.add_dependency(Nowtjob(True))
+            self.j.add_dependency(MockJob(True))
 
         with unittest.mock.patch.object(self.j,'check_self',return_value = True) as ok:
             rv = self.j.Ok()
@@ -74,15 +74,8 @@ class BaseJobTests(unittest.TestCase):
         self.assertEqual(rv,True)
 
     def test_OK_calls_check_self_and_calls_ok_on_deps_if_true_It_only_take_one_dep_to_fail_Ok(self,):
-        class Nowtjob(Job):
-            def __init__(self, ok):
-                self._ok = ok
-
-            def Ok(self):
-                return self._ok
-
         for i in range(10):
-            self.j.add_dependency(Nowtjob(i == 9))
+            self.j.add_dependency(MockJob(i == 9))
 
         with unittest.mock.patch.object(self.j,'check_self',return_value = True) as ok:
             rv = self.j.Ok()
