@@ -8,6 +8,8 @@ class Job:
     def __init__(self,):
         self.dependencies = []
         self.done = False
+        self.out = None
+        self.err = None
 
     def add_dependency(self, newdep):
         self.dependencies.append(newdep)

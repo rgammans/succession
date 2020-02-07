@@ -196,3 +196,8 @@ class BaseJobTests(unittest.TestCase):
             await self.j._run()
 
         runner.assert_called_once_with()
+
+
+    def test_job_has_out_and_err_attributes_to_store_messages_from_run(self,):
+        self.j.out
+        self.j.err
