@@ -120,6 +120,13 @@ class BaseJobTests(unittest.TestCase):
         self.assertEqual(rv,self.j)
 
 
+    def test_add_dependency_only_add_single_job_once(self,):
+        self.j.add_dependency(unittest.mock.sentinel.NEW_DEP)
+        self.j.add_dependency(unittest.mock.sentinel.NEW_DEP)
+        self.assertIn( unittest.mock.sentinel.NEW_DEP, self.j.dependencies,)
+        self.assertEqual(len(self.j.dependencies),1)
+
+
     def test_dunder_run_call_Run_on_all_it_dependencies_when_they_need_to_run(self,):
         deps = []
         for i in range(10):
@@ -202,3 +209,4 @@ class BaseJobTests(unittest.TestCase):
     def test_job_has_out_and_err_attributes_to_store_messages_from_run(self,):
         self.j.out
         self.j.err
+

@@ -6,7 +6,7 @@ async def nothing_to_do():
 
 class Job:
     def __init__(self,):
-        self.dependencies = []
+        self.dependencies = set()
         self.done = False
         self.out = None
         self.err = None
@@ -19,7 +19,7 @@ class Job:
 
         :returns: self
         """
-        self.dependencies.append(newdep)
+        self.dependencies.add(newdep)
         return self
 
     def Ok(self):
@@ -40,6 +40,7 @@ class Job:
              d.Run() for d in self.dependencies
         ]
         await asyncio.gather(*dep_tasks )
+#        print (self, self.done, len(self.dependencies)
         await self.do_run()
         print (self.out)
   #      print (self.err, file=sys.stderr)
