@@ -76,13 +76,16 @@ class RegsiteredJobTests(unittest.TestCase):
     def test_adding_a_non_job_depencise_a_registered_job_loks_up_the_job_in_the_registry(self,):
         j1 = registry.RegisteredJob(target=unittest.mock.sentinel.TARGET_ONE)
         j2 = registry.RegisteredJob(target=unittest.mock.sentinel.TARGET_TWO)
-        j2.add_dependency(unittest.mock.sentinel.TARGET_ONE)
+        rv = j2.add_dependency(unittest.mock.sentinel.TARGET_ONE)
+        #add add_dependency should return self.
+        self.assertEqual(rv,j2)
         self.assertIn(j1,j2.dependencies)
 
 
     def test_adding_a_non_job_depencise_a_unregistered_job_stores_job_adds_the_job_when_resolve_called(self,):
         j2 = registry.RegisteredJob(target=unittest.mock.sentinel.TARGET_TWO)
-        j2.add_dependency(unittest.mock.sentinel.TARGET_ONE)
+        rv= j2.add_dependency(unittest.mock.sentinel.TARGET_ONE)
+        self.assertEqual(rv,j2)
         self.assertEqual(len(j2.dependencies),0)
 
         j1 = registry.RegisteredJob(target=unittest.mock.sentinel.TARGET_ONE)
@@ -92,5 +95,6 @@ class RegsiteredJobTests(unittest.TestCase):
     def test_adding_a_non_job_depencise_a_unregistered_job_reaises_a_key_error_if_defer_turned_off(self,):
         j2 = registry.RegisteredJob(target=unittest.mock.sentinel.TARGET_TWO, no_deferred_dependencies = True)
         with self.assertRaises(KeyError):
-            j2.add_dependency(unittest.mock.sentinel.TARGET_ONE)
+            rv = j2.add_dependency(unittest.mock.sentinel.TARGET_ONE)
+            self.assertEqual(rv,j2)
 

@@ -114,9 +114,10 @@ class BaseJobTests(unittest.TestCase):
     def test_a_new_job_has_an_empty_deps_list(self,):
         self.assertEqual(len(self.j.dependencies),0)
 
-    def test_add_depency_adds_it_argument_to_depencies(self,):
-        self.j.add_dependency(unittest.mock.sentinel.NEW_DEP)
+    def test_add_depency_adds_it_argument_to_depencies_ad_returns_self(self,):
+        rv = self.j.add_dependency(unittest.mock.sentinel.NEW_DEP)
         self.assertIn( unittest.mock.sentinel.NEW_DEP, self.j.dependencies,)
+        self.assertEqual(rv,self.j)
 
 
     def test_dunder_run_call_Run_on_all_it_dependencies_when_they_need_to_run(self,):

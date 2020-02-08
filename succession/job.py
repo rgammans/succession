@@ -12,7 +12,15 @@ class Job:
         self.err = None
 
     def add_dependency(self, newdep):
+        """Adds another job as a add_dependency of this job.
+
+        Dependencies are jobs whihc must be Ok() before 
+        this job runs.
+
+        :returns: self
+        """
         self.dependencies.append(newdep)
+        return self
 
     def Ok(self):
         """Return false if 'target' is not upto-date. Ie the Job needs to be run"""
@@ -33,7 +41,10 @@ class Job:
         ]
         await asyncio.gather(*dep_tasks )
         await self.do_run()
+        print (self.out)
+  #      print (self.err, file=sys.stderr)
         self.done = True
+
         return None
 
     def check_self(self,):

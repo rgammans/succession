@@ -61,9 +61,9 @@ class RegisteredJob(job.Job):
             except KeyError:
                 if self.nodelay: raise
                 self.unresolved.add(dep)
-                return
+                return self
 
-        super().add_dependency(dep)
+        return super().add_dependency(dep)
 
     def resolve_dependencies(self, ):
         for d in self.unresolved:
