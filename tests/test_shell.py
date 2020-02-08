@@ -15,6 +15,9 @@ class MockProcess:
         return self.stdout, self.stderr
 
 
+async def getMockProcess(*args,**kwargs):
+    return MockProcess(*args,**kwargs)
+
 class ShellJobTest(unittest.TestCase):
 
     def test_shell_job_calls_contstructs_the_job(self,):
@@ -25,7 +28,7 @@ class ShellJobTest(unittest.TestCase):
     def test_shell_job_calls_x_to_run_its_command_string(self,):
 
         s = shell.ShellJob(command = unittest.mock.sentinel.SHELLCOMMAND)
-        with unittest.mock.patch.object(asyncio,'create_subprocess_shell', return_value = MockProcess(0,'','')) as runner:
+        with unittest.mock.patch.object(asyncio,'create_subprocess_shell', return_value = getMockProcess(0,'','')) as runner:
             asyncio.run(s.do_run())
 
         runner.assert_called_once_with(
@@ -35,7 +38,7 @@ class ShellJobTest(unittest.TestCase):
         )
 
     def test_shell_job_captures_stdin_stdout_of_command_string(self,):
-        process = MockProcess(0,
+        process = getMockProcess(0,
             unittest.mock.sentinel.STDOUT,
             unittest.mock.sentinel.STDERR
         )
@@ -54,7 +57,7 @@ class ShellJobTest(unittest.TestCase):
 
     def test_shell_job_raises_an_error_if_the_rc_is_nonzero(self,):
         s = shell.ShellJob(command = unittest.mock.sentinel.SHELLCOMMAND)
-        with unittest.mock.patch.object(asyncio,'create_subprocess_shell', return_value = MockProcess(1,'','')) as runner:
+        with unittest.mock.patch.object(asyncio,'create_subprocess_shell', return_value = getMockProcess(1,'','')) as runner:
             with self.assertRaises(JobFailed):
                 asyncio.run(s.do_run())
 

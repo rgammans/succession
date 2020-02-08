@@ -9,7 +9,7 @@ class ShellJob(job.Job):
         super().__init__(**kwargs)
 
     async def do_run(self,):
-        proc = asyncio.create_subprocess_shell(self.command,
+        proc = await asyncio.create_subprocess_shell(self.command,
                 stdout =  asyncio.subprocess.PIPE,
                 stderr = asyncio.subprocess.PIPE,
         )
