@@ -57,6 +57,26 @@ class RegistryTests(unittest.TestCase):
         registry.add_target("name", unittest.mock.sentinel.JOB)
         self.assertEqual(registry.find_target("name"),unittest.mock.sentinel.JOB)
 
+    def test_resolve_all_calls_resolve_dependencies_on_all_jobs_in_the_registry(self,):
+        class MockJob:
+            def __init__(self,):
+                self.resolved = False
+            def resolve_dependencies(self,):
+                self.resolved = True
+        jobs = []
+        ## Fill the regsitry
+        for i in range(10):
+            j = MockJob()
+            registry.add_target(i,j)
+            jobs.append(j)
+
+        registry.resolve_all()
+        for j in jobs:
+            self.assertTrue(j.resolved)
+        
+
+
+
 class RegsiteredJobTests(unittest.TestCase):
 
     def setUp(self,):

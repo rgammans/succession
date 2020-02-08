@@ -41,6 +41,10 @@ def find_target(t):
     """Returns the job associated with the target"""
     return _registry_store[t]
 
+def resolve_all():
+    for job in _registry_store.values():
+        job.resolve_dependencies()
+
 class RegisteredJob(job.Job):
     """RegisteredJob auto add themeselves the the reigstry and
     can resovled dependencies on targets rather than other jobs.
