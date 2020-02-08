@@ -59,7 +59,10 @@ def main(args):
     opts = parser.parse_args(args)
     run(opts)
 
-
-if __name__ == "__main__":
+def start():
     import sys
     main(sys.argv[1:])
+
+if __name__ == "__main__":
+    start()
+
