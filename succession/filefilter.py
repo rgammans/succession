@@ -8,3 +8,6 @@ class FileFilterJob(registry.RegisteredJob):
         kwargs['target']  = pathlib.Path(kwargs.pop('target',None)).resolve()
         super().__init__(**kwargs)
         self.add_dependency(self.source)
+
+    def check_self(self,):
+        return self.target.stat().st_mtime > self.source.stat().st_mtime
