@@ -1,0 +1,11 @@
+class Count(ShellJob, RegisteredJob):
+    def check_self(self,):
+        return False
+
+
+four=Count(target="Four", command = "echo 'Four'").add_dependency("Three")
+three=Count(target="Three", command = "echo 'Three'").add_dependency("Two")
+two = Count(target="Two", command = "echo 'Two'").add_dependency("One")
+Count(target="One", command = "echo 'One'")
+
+add_target('default',four)
