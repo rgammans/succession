@@ -5,11 +5,20 @@ import asyncio
 from succession import shell
 from succession.exceptions import JobFailed
 
+class MockStream:
+    def __init__(self,v):
+        self.str_v = v
+
+    def decode(self,):
+        return self.str_v
+
+
+
 class MockProcess:
     def __init__(self,rc, stdout, stderr):
         self.returncode = rc
-        self.stdout = stdout
-        self.stderr = stderr
+        self.stdout = MockStream(stdout)
+        self.stderr = MockStream(stderr)
 
     async def communicate(self, inp = None):
         return self.stdout, self.stderr
@@ -37,10 +46,10 @@ class ShellJobTest(unittest.TestCase):
                 stderr=asyncio.subprocess.PIPE
         )
 
-    def test_shell_job_captures_stdin_stdout_of_command_string(self,):
+    def test_shell_job_captures_stdin_stdout_of_command_string_can_removes_trailling_nls(self,):
         process = getMockProcess(0,
-            unittest.mock.sentinel.STDOUT,
-            unittest.mock.sentinel.STDERR
+            "unittest.mock.sentinel.STDOUT\n",  ## These neeed to be strings
+            "unittest.mock.sentinel.STDERR\n"
         )
         s = shell.ShellJob(command = unittest.mock.sentinel.SHELLCOMMAND)
         with unittest.mock.patch.object(asyncio,'create_subprocess_shell', return_value = process) as runner:
@@ -52,8 +61,8 @@ class ShellJobTest(unittest.TestCase):
                 stderr=asyncio.subprocess.PIPE
         )
 
-        self.assertEqual(s.out,  unittest.mock.sentinel.STDOUT)
-        self.assertEqual(s.err, unittest.mock.sentinel.STDERR )
+        self.assertEqual(s.out,  "unittest.mock.sentinel.STDOUT")
+        self.assertEqual(s.err,  "unittest.mock.sentinel.STDERR" )
 
     def test_shell_job_raises_an_error_if_the_rc_is_nonzero(self,):
         s = shell.ShellJob(command = unittest.mock.sentinel.SHELLCOMMAND)

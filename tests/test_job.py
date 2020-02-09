@@ -3,7 +3,8 @@ import unittest.mock
 import asyncio
 import aiounittest
 
-from succession.job import Job
+from succession.job import Job, OutputSender, logger
+import succession.job
 
 async def empty_coroutine_gen():pass
 empty_coroutine = empty_coroutine_gen()
@@ -18,6 +19,8 @@ class MockJob(Job):
         self.has_run = False
         self._ok = ok
         self.task = task
+        self.out = None
+        self.err = None
 
     def Ok(self):
         return self._ok
@@ -127,7 +130,7 @@ class BaseJobTests(unittest.TestCase):
         self.assertEqual(len(self.j.dependencies),1)
 
 
-    def test_dunder_run_call_Run_on_all_it_dependencies_when_they_need_to_run(self,):
+    def test_under_run_call_Run_on_all_it_dependencies_when_they_need_to_run(self,):
         deps = []
         for i in range(10):
             x = MockJob(False)
@@ -139,7 +142,7 @@ class BaseJobTests(unittest.TestCase):
         for x in deps:
             self.assertTrue(x.has_run)
 
-    def test_dunder_run_call_Run_on_all_it_dependencies_when_they_dont_need_to_run(self,):
+    def test_under_run_call_Run_on_all_it_dependencies_when_they_dont_need_to_run(self,):
         deps = []
         for i in range(10):
             x = MockJob(True)
@@ -156,6 +159,24 @@ class BaseJobTests(unittest.TestCase):
             asyncio.run(self.j._run())
 
         runner.assert_called_once_with()
+
+    def test_under_run_protect_do_run_with_ouptut_sender_wraping_it(self,):
+        runner = None
+        this = self
+        class MockOpSender:
+            def __init__(self, j):
+                this.assertEqual(j,this.j)
+            def __enter__(self,):
+                runner.assert_not_called()
+            def __exit__(self,et,ev,tb):
+                runner.assert_called_once_with()
+
+        with unittest.mock.patch.object(self.j,'do_run',return_value = empty_coroutine_gen()) as runner,\
+             unittest.mock.patch.object(succession.job,'OutputSender', MockOpSender):
+
+            asyncio.run(self.j._run())
+
+
 
 
     @aiounittest.async_test
@@ -209,4 +230,49 @@ class BaseJobTests(unittest.TestCase):
     def test_job_has_out_and_err_attributes_to_store_messages_from_run(self,):
         self.j.out
         self.j.err
+
+
+
+
+class OutputSenderTest(unittest.TestCase):
+
+    def setUp(self,):
+        self.job = MockJob(False)
+        self.os = OutputSender(self.job)
+
+    def test_dunder_enter_returns_self(self,):
+        self.assertEqual(self.os.__enter__(), self.os)
+
+    def test_dunder_exit_calls_info_with_stdout_when_noex(self,):
+        self.job.out = unittest.mock.sentinel.OUTDATA
+        with unittest.mock.patch.object(logger, 'info') as info:
+            self.os.__exit__(None,None,None)
+        
+        info.assert_called_once_with(unittest.mock.sentinel.OUTDATA)
+
+    def test_dunder_exit_calls_info_with_stdout_when_excption_raised(self,):
+        self.job.out = unittest.mock.sentinel.OUTDATA
+        with unittest.mock.patch.object(logger, 'info') as info:
+            self.os.__exit__(Exception(), Exception, [])
+
+        info.assert_called_once_with(unittest.mock.sentinel.OUTDATA)
+
+    def test_dunder_exit_calls_err_with_stderr_when_noex(self,):
+        self.job.err = unittest.mock.sentinel.OUTDATA
+        with unittest.mock.patch.object(logger, 'error') as err,\
+             unittest.mock.patch.object(logger, 'critical') as crit:
+            self.os.__exit__(None,None,None)
+
+        err.assert_called_once_with(unittest.mock.sentinel.OUTDATA)
+        crit.assert_not_called()
+
+    def test_dunder_exit_calls_critical_with_stderr_when_excption_raised(self,):
+        self.job.err = unittest.mock.sentinel.OUTDATA
+        with unittest.mock.patch.object(logger, 'error') as err,\
+             unittest.mock.patch.object(logger, 'critical') as crit:
+            self.os.__exit__(Exception(), Exception, [])
+
+        crit.assert_called_once_with(unittest.mock.sentinel.OUTDATA)
+        err.assert_not_called()
+
 

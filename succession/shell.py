@@ -13,7 +13,8 @@ class ShellJob(job.Job):
                 stdout =  asyncio.subprocess.PIPE,
                 stderr = asyncio.subprocess.PIPE,
         )
-        self.out, self.err = await proc.communicate()
+        stdout, stderr = await proc.communicate()
+        self.out, self.err = stdout.decode().rstrip(), stderr.decode().rstrip()
         if proc.returncode != 0:
             raise JobFailed(self)
  

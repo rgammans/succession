@@ -1,7 +1,32 @@
 import asyncio
+import logging
+
+logger= logging.getLogger(__name__)
 
 async def nothing_to_do():
     return
+
+
+class OutputSender:
+    def __init__(self,job):
+        self.job  = job
+
+    def __enter__(self,):
+        return self
+
+    def __exit__(self, ev,et, tb):
+        """Send any capture err, and out strings to the logging
+        subsystem.
+        """
+        if ev is None:
+            error = logger.error
+        else:
+            error = logger.critical
+
+        if self.job.out:
+            logger.info(self.job.out)
+        if self.job.err:
+            error(self.job.err,)
 
 
 class Job:
@@ -33,7 +58,6 @@ class Job:
             return self._run()
         else:
             return nothing_to_do()
-
     async def _run(self,):
         if self.done: return
         dep_tasks = [
@@ -41,9 +65,10 @@ class Job:
         ]
         await asyncio.gather(*dep_tasks )
 #        print (self, self.done, len(self.dependencies)
-        await self.do_run()
-        print (self.out)
-  #      print (self.err, file=sys.stderr)
+        success = True
+        with OutputSender(self):
+            await self.do_run()
+
         self.done = True
 
         return None
