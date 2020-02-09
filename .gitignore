@@ -5,6 +5,10 @@
 *.sw[a-p]
 
 .tox/
+Succession.egg-info/
+.eggs/
+build/
+dist/
 
 *LOCAL*
 *REMOTE*

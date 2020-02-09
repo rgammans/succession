@@ -18,7 +18,7 @@ setup(
 
     license="GPLv3",
     description="A task runner with dependencies",
-    install_requires=[ ],
+    install_requires=[ 'colorlog' ],
     test_suite='tests',
     entry_points={
          "console_scripts": [
