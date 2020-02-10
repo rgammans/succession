@@ -57,6 +57,8 @@ class RegisteredJob(job.Job):
         super().__init__(*args,**kwargs)
         add_target(self.target, self)
 
+    def __repr__(self,):
+        return f"{self.target}({self.__class__})"
 
     def add_dependency(self, dep):
         if not isinstance(dep,job.Job):

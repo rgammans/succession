@@ -5,8 +5,11 @@ import asyncio
 import pathlib
 import runpy
 from succession.registry import resolve_all, find_target
+from succession.exceptions import JobFailed
 import logging
 import sys
+
+logger = logging.getLogger(__name__)
 
 try:
     from colorlog import ColoredFormatter
@@ -65,7 +68,7 @@ class JobResolver:
 
 def execute_successfile(fname):
     from succession import prelude
-    runpy.run_path(fname, init_globals =  prelude.__dict__,)
+    runpy.run_path(fname, init_globals =  prelude.__dict__, run_name=fname)
 
 
 def setup_logging(opts):
@@ -101,7 +104,11 @@ def run(opts):
     setup_logging(opts)
     execute_successfile(opts.file)
     resolve_all()
-    asyncio.run(opts.initialjob())
+    try:
+        asyncio.run(opts.initialjob())
+    except JobFailed as failure:
+        jobname = repr(failure.job)
+        logger.critical(f"Job {jobname} exited with non-zero returncode")
 
 def main(args):
     parser = get_parser()
