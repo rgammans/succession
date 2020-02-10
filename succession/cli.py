@@ -7,22 +7,28 @@ import runpy
 from succession.registry import resolve_all, find_target
 import logging
 import sys
-from colorlog import ColoredFormatter
+
+try:
+    from colorlog import ColoredFormatter
+except ModuleNotFoundError:
+    ColoredFormatter = None
 
 def get_parser():
     parser = argparse.ArgumentParser(description="Resolve dependency and run tasks")
-    parser.add_argument('--file','-f', type=str, default="Sucessfile")
+    parser.add_argument('--file','-f', type=str, default="Successfile")
     verbgroup = parser.add_mutually_exclusive_group()
     verbgroup.add_argument('--verbose', '-v', action='count', default=0, help="Increase verbosity")
     verbgroup.add_argument('--quiet', '-q', action='store_true', help="Silences all but critical errors")
-    colourgroup = parser.add_mutually_exclusive_group()
-    colourgroup.add_argument('--colour', action='store_true', help="Enables colour output on terminals which support it")
-    colourgroup.add_argument('--no-colour', dest = "colour", action='store_false' ,help="Disables colour output")
-       
     parser.add_argument('initialjob', metavar="TARGET", type=JobResolver,
                          default= JobResolver(None), nargs='?', )
+
+    colourgroup = parser.add_mutually_exclusive_group()
+    colourgroup.add_argument('--no-colour', dest = "colour", action='store_false' ,help="Disables colour output")
+    if ColoredFormatter:
+        colourgroup.add_argument('--colour', action='store_true', help="Enables colour output on terminals which support it")
+
     parser.set_defaults(**{
-        'colour': sys.stdin.isatty()
+        'colour': ColoredFormatter and sys.stdin.isatty()
     })
     return parser
 
@@ -87,7 +93,7 @@ def setup_logging(opts):
            },
            secondary_log_colors={},
            style='%'
-        ) 
+        )
         handler.setFormatter(formatter)
     rootlogger.addHandler(handler)
 
