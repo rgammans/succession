@@ -1,0 +1,60 @@
+#Initial conversion of Sphinx's Makefile to Successfile
+#
+# Successfile v0.1.0
+import os
+
+SPHINX_OPTS    = ""
+try:
+    opts = os.environ["SPHINX_OPTS"]
+    SPHINX_OPTS = SPHINX_OPTS + " "+opts
+except KeyError:pass
+
+SPHINXBUILD   = "sphinx-build"
+SOURCEDIR     = "."
+BUILDDIR      = "_build"
+
+class AlwaysRun(ShellJob,RegisteredJob):
+    def check_self(self,):
+        return False
+
+
+
+# Iterate through the available modes, and 
+# define a rebuild rule for each.
+# 
+# The original makefile had itself as a dependency
+# but without a file of the name below being created
+# or guaranteed mtime update we don't bother
+# 
+for target in [
+        "help",
+        "html",
+        "dirhtml",
+        "singlehtml",
+        "pickle",
+        "json",
+        "htmlhelp",
+        "qthelp",
+        "devhelp",
+        "epub",
+        "latex",
+        "latexpdf",
+        "latexpdfja",
+        "text",
+        "man",
+        "texinfo",
+        "info",
+        "gettext",
+        "changes",
+        "xml",
+        "pseudoxml",
+        "linkcheck",
+        "doctest",
+        "coverage" ]:
+    AlwaysRun( target=target,
+        command=f'{SPHINXBUILD} -M {target} "{SOURCEDIR}" "{BUILDDIR}" {SPHINX_OPTS}'
+    )
+
+# Make help default target
+#
+add_target("default",find_target("help"))

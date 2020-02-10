@@ -9,6 +9,7 @@ Succession.egg-info/
 .eggs/
 build/
 dist/
+docs/_build/
 
 *LOCAL*
 *REMOTE*
