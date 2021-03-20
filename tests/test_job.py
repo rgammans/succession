@@ -2,6 +2,7 @@ import unittest
 import unittest.mock
 import asyncio
 import aiounittest
+from  unittest.mock import MagicMock
 
 from succession.job import Job, OutputSender, logger
 import succession.job
@@ -68,7 +69,10 @@ class BaseJobTests(unittest.TestCase):
 
     def test_jobs_run_method_calls_Ok_first_and_does_call_underrun_iffalse_and_returns_underruns_rv(self,):
         with unittest.mock.patch.object(self.j,'Ok',return_value = False) as ok,\
-             unittest.mock.patch.object(self.j,'_run',return_value =unittest.mock.sentinel.RETVALUE) as run:
+             unittest.mock.patch.object(self.j,'_run',
+                                        new = MagicMock(return_value =unittest.mock.sentinel.RETVALUE)
+                    ) as run:
+
             rv = self.j.Run()
 
         ok.assert_called_once_with()

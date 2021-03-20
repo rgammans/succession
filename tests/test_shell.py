@@ -2,6 +2,7 @@ import unittest
 import unittest.mock
 import pathlib
 import asyncio
+import sys
 from succession import shell
 from succession.exceptions import JobFailed
 
@@ -23,9 +24,15 @@ class MockProcess:
     async def communicate(self, inp = None):
         return self.stdout, self.stderr
 
+if sys.version_info.minor > 7:
+    ## Chnages around unittest and aiountites means the 
+    # waymocks work suggest that we don't need this as co-reoinr in 3.8 and later
+    def getMockProcess(*args,**kwargs):
+        return MockProcess(*args,**kwargs)
+else:
+     async def getMockProcess(*args,**kwargs):
+        return MockProcess(*args,**kwargs)
 
-async def getMockProcess(*args,**kwargs):
-    return MockProcess(*args,**kwargs)
 
 class ShellJobTest(unittest.TestCase):
 
