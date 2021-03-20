@@ -20,4 +20,19 @@ library wherever possible, by keeping successions core small
 and simple as possible the aim to make it easy to use and
 understand.
 
+Dependencies
+------------
+This project has do dependencies for running other then the  
+python standard library. However a Pipfile contains dev dependencies
+required for building the documentation
 
+
+Documentation
+-------------
+
+Documentation is built using sphinx.
+
+```
+    cd docs;
+    pipenv run ./build_from_repo.sh
+```
