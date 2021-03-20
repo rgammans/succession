@@ -1,6 +1,10 @@
 Succession
 ==========
 
+..  image:: https://github.com/rgammans/succession/actions/workflows/toxtests.yml/badge.svg
+    :alt: Python package tests
+    :target: https://github.com/rgammans/succession/actions/workflows/toxtests.yml
+
 A program to control running small jobs and there dependent.
 
 This could be thought of as another challenger for Makes crown.
