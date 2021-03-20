@@ -30,9 +30,8 @@ required for building the documentation
 Documentation
 -------------
 
-Documentation is built using sphinx.
+Documentation is built using sphinx::
 
-```
     cd docs;
     pipenv run ./build_from_repo.sh
-```
+
