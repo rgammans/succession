@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Succession"
+version = "0.1.0"
+description = "A task runner with dependencies"
+authors = [
+    {name = "Roger Gammans", email = "rgammans@gammascience.co.uk"}
+]
+license = {text = "GPLv3"}
+requires-python = ">3.7"
+dependencies = [
+    "colorlog"
+]
+
+[project.scripts]
+succession = "succession.cli:start"
+
+[tool.setuptools]
+packages = ["succession"]
+include-package-data = true
+
+#[tool.setuptools.packages.find]
+#where = ["."]
+
+
+[tool.tox]
+env_list = ["py"]
+
+[tool.tox.env_run_base]
+deps = ["aiounittest"]
+commands = [
+    ["python", "-m", "unittest", "discover", "-s", "tests"]
+]

@@ -5,7 +5,7 @@ Succession
     :alt: Python package tests
     :target: https://github.com/rgammans/succession/actions/workflows/toxtests.yml
 
-A program to control running small jobs and there dependent.
+A program to control running small jobs and there dependencies.
 
 This could be thought of as another challenger for Makes crown.
 
